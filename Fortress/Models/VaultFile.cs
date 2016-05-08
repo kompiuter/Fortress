@@ -46,7 +46,14 @@ namespace Fortress.Models
                 return _fileTitle;
             }
         }
-        
+
+        [JsonIgnore]
+        static Random rnd = new Random();
+
+        [JsonRequired]
+        // Used to randomly pad the encrypted file, to throw off attackers
+        private string _internalPadding1 { get; } = EncryptionService.GetRandomString(rnd.Next(25, 125));
+
 
         private ObservableCollection<VaultFileEntry> _entries;
         public ObservableCollection<VaultFileEntry> Entries
@@ -54,6 +61,10 @@ namespace Fortress.Models
             get { return _entries; }
             set { Set(ref _entries, value); }
         }
+
+        [JsonRequired]
+        // Used to randomly pad the encrypted file, to throw off attackers
+        private string _internalPadding2 { get; } = EncryptionService.GetRandomString(rnd.Next(25, 125));
 
 
         public async Task<bool> Decrypt(string key)
@@ -88,10 +99,9 @@ namespace Fortress.Models
             // Encrypt serialized object
             string encrStr = EncryptionService.Encrypt(serVault, _key);
 
-   
-            // byte[] bytes = Encoding.UTF8.GetBytes(encrStr);
             using (var fileStream = await _file.OpenStreamForWriteAsync())
             {
+                // Deletes any content already present in file
                 fileStream.SetLength(0);
 
                 using (var writer = new StreamWriter(fileStream))

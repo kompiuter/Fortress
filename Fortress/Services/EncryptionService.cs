@@ -13,6 +13,14 @@ namespace Fortress.Services
 {
     static class EncryptionService
     {
+        public static string GetRandomString(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var random = new Random();
+            return new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
         private static IBuffer GetMD5Hash(string key)
         {
             // Convert the message string to binary data.
