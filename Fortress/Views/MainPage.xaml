@@ -1,0 +1,100 @@
+<Page x:Class="Fortress.Views.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:Behaviors="using:Template10.Behaviors"
+      xmlns:Core="using:Microsoft.Xaml.Interactions.Core"
+      xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
+      xmlns:Toolkit="using:MyToolkit.Controls"
+      xmlns:controls="using:Template10.Controls"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="using:Fortress.Views"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:vm="using:Fortress.ViewModels"
+      mc:Ignorable="d">
+
+    <Page.DataContext>
+        <vm:MainPageViewModel />
+    </Page.DataContext>
+
+    <RelativePanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+        <!--<VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="AdaptiveVisualStateGroup">
+                <VisualState x:Name="VisualStateNarrow">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource NarrowMinWidth}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters />
+                </VisualState>
+                <VisualState x:Name="VisualStateNormal">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource NormalMinWidth}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters />
+                </VisualState>
+                <VisualState x:Name="VisualStateWide">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource WideMinWidth}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters />
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>-->
+
+        <controls:PageHeader x:Name="pageHeader"
+                             RelativePanel.AlignLeftWithPanel="True"
+                             RelativePanel.AlignRightWithPanel="True"
+                             RelativePanel.AlignTopWithPanel="True">
+            <controls:PageHeader.Content>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Vault" VerticalAlignment="Center" FontSize="21"/>
+                    <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" FontSize="16" Opacity="0.6" Text="{Binding Vault.FileTitle}"/>
+                </StackPanel>
+            </controls:PageHeader.Content>
+            <controls:PageHeader.PrimaryCommands>
+                <AppBarButton Icon="Back" Label="Go back" Command="{Binding GoBackCommand}"/>
+                <AppBarButton Icon="Save" Label="Save vault" Command="{Binding SaveVaultCommand}"/>
+            </controls:PageHeader.PrimaryCommands>
+        </controls:PageHeader>
+
+        <Toolkit:DataGrid Margin="4"
+                          ItemsSource="{Binding Vault.Entries}"
+                          RelativePanel.AlignLeftWithPanel="True"
+                          RelativePanel.AlignRightWithPanel="True"
+                          RelativePanel.Below="pageHeader"
+                          SelectedItem="{Binding SelectedEntry,
+                                                 Mode=TwoWay}">
+            <Toolkit:DataGrid.Columns>
+                <Toolkit:DataGridTextColumn Width="140"
+                                            Binding="{Binding Title}"
+                                            Header="Title" />
+                <Toolkit:DataGridTextColumn Width="180"
+                                            Binding="{Binding Username}"
+                                            Header="User" />
+                <!--<Toolkit:DataGridTextColumn Width="192"
+                                            Binding="{Binding CreatedAt}"
+                                            Header="Created At" />-->
+                <Toolkit:DataGridTextColumn Width="192"
+                                            Binding="{Binding ModifiedAt}"
+                                            Header="Last Modified" />
+            </Toolkit:DataGrid.Columns>
+        </Toolkit:DataGrid>
+
+    </RelativePanel>
+
+    <Page.BottomAppBar>
+        <CommandBar>
+            <AppBarButton Command="{Binding NewEntryCommand}"
+                          Label="New entry"
+                          Icon="Add" />
+            <AppBarButton Command="{Binding EditEntryCommand}"
+                          Label="Edit entry"
+                          Icon="Edit" />
+            <AppBarButton Command="{Binding DeleteEntryCommand}"
+                          Label="Delete entry"
+                          Icon="Delete" />
+        </CommandBar>
+    </Page.BottomAppBar>
+
+</Page>
+
