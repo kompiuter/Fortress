@@ -1,7 +1,0 @@
-﻿# Allow demo temporary keys
-!*_TemporaryKey.pfx
-
-# NuGet
-*.nuget.props
-*.nuget.targets
-*.lock.json

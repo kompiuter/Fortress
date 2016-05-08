@@ -125,7 +125,6 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
-    <Content Include=".gitignore" />
     <Content Include="Assets\fortressicon150x150.png" />
     <Content Include="Assets\fortressicon300x300.png" />
     <Content Include="Assets\fortressicon88x88.png" />
