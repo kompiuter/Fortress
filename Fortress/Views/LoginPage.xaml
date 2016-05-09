@@ -21,7 +21,7 @@
 
         <Image Source="/Resources/fortresslogo2.png"
                Margin="0,0,0,32"
-               Width="226"
+               Width="96"
                RelativePanel.Above="rectangle"
                RelativePanel.AlignHorizontalCenterWithPanel="True"/>
 

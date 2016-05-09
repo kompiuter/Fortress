@@ -5,6 +5,8 @@
                xmlns:local="using:Fortress.Dialogs"
                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                MaxWidth="400"
+               MaxHeight="512"
+               VerticalAlignment="Center"
                d:DesignHeight="300"
                d:DesignWidth="400"
                PrimaryButtonText="OK"

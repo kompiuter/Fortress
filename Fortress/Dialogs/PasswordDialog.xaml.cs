@@ -35,21 +35,64 @@ namespace Fortress.Dialogs
 
         private void passwordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
-            if (passwordBox.Password == repeatPasswordBox.Password)
+            if (ValidatePassword(passwordBox.Password))
             {
-                IsPrimaryButtonEnabled = true;
-                PasswordErrorVisibility = Visibility.Collapsed;
+                ValidationVisibility = Visibility.Collapsed;
+
+                if (passwordBox.Password == repeatPasswordBox.Password)
+                {
+                    IsPrimaryButtonEnabled = true;
+                    PasswordErrorVisibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    IsPrimaryButtonEnabled = false;
+                    PasswordErrorVisibility = Visibility.Visible;
+                }
             }
             else
             {
                 IsPrimaryButtonEnabled = false;
-                PasswordErrorVisibility = Visibility.Visible;
+                ValidationVisibility = Visibility.Visible;
             }
 
-            if (string.IsNullOrEmpty(passwordBox.Password) || string.IsNullOrEmpty(repeatPasswordBox.Password))
-                IsPrimaryButtonEnabled = false;
+            //if (string.IsNullOrEmpty(passwordBox.Password) || string.IsNullOrEmpty(repeatPasswordBox.Password))
+            //    IsPrimaryButtonEnabled = false;
 
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ValidationVisibility)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PasswordErrorVisibility)));
+        }
+
+        private bool ValidatePassword(string password)
+        {
+            if (string.IsNullOrWhiteSpace(password))
+                return false;
+
+            // In order for password to be valid it must be
+            // 1 - At least 8 characters
+            // 2 - Contains three of the following:
+            //   i. Upper case characters
+            //   ii. Lower case characters
+            //   iii. Symbols
+            //   iiii. Digits
+            if (password.Length < 8)
+                return false;
+
+            int conditionsMet = 0;
+
+            if (password.Any(c => Char.IsUpper(c)))
+                ++conditionsMet;
+            if (password.Any(c => Char.IsLower(c)))
+                ++conditionsMet;
+            if (password.Any(c => Char.IsDigit(c)))
+                ++conditionsMet;
+            if (password.Any(c => Char.IsSymbol(c) || char.IsPunctuation(c)))
+                ++conditionsMet;
+
+            if (conditionsMet >= 3)
+                return true;
+            else
+                return false;
         }
 
         private void PasswordDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
@@ -67,6 +110,7 @@ namespace Fortress.Dialogs
         private string TimeToCrack { get; set; }
 
         private Visibility PasswordErrorVisibility { get; set; } = Visibility.Collapsed;
+        private Visibility ValidationVisibility { get; set; } = Visibility.Collapsed;
 
         public string FilePath
         {
