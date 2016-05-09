@@ -145,6 +145,7 @@ namespace Fortress.ViewModels
             SelectedEntry = null;
 
             NavigationService.Navigate(typeof(LoginPage));
+            NavigationService.ClearHistory();
 
             return Task.CompletedTask;
         }

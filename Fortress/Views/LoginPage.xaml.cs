@@ -27,6 +27,7 @@ namespace Fortress.Views
         public LoginPage()
         {
             this.InitializeComponent();
+            NavigationCacheMode = NavigationCacheMode.Disabled;
         }
 
         public LoginPageViewModel Vm => (LoginPageViewModel)DataContext;

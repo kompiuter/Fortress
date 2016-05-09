@@ -12,7 +12,7 @@ namespace Fortress.Views
         public MainPage()
         {
             InitializeComponent();
-            NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
+            NavigationCacheMode = NavigationCacheMode.Disabled;
         }
 
         public MainPageViewModel Vm => (MainPageViewModel)DataContext;
