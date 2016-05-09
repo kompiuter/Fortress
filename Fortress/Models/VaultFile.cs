@@ -21,16 +21,15 @@ namespace Fortress.Models
             VaultID = Guid.NewGuid();
         }
 
+        #region Properties
+
         [JsonRequired]
         public Guid VaultID { get; private set; }
         
-        [JsonIgnore]
         private StorageFile _file { get; }
 
-        [JsonIgnore]
         private string _key { get; set; }
 
-        [JsonIgnore]
         private string _fileTitle = string.Empty;
         [JsonIgnore]
         public string FileTitle
@@ -47,14 +46,6 @@ namespace Fortress.Models
             }
         }
 
-        [JsonIgnore]
-        static Random rnd = new Random();
-
-        [JsonRequired]
-        // Used to randomly pad the encrypted file, to throw off attackers
-        private string _internalPadding1 { get; } = EncryptionService.GetRandomString(rnd.Next(25, 125));
-
-
         private ObservableCollection<VaultFileEntry> _entries;
         public ObservableCollection<VaultFileEntry> Entries
         {
@@ -62,10 +53,7 @@ namespace Fortress.Models
             set { Set(ref _entries, value); }
         }
 
-        [JsonRequired]
-        // Used to randomly pad the encrypted file, to throw off attackers
-        private string _internalPadding2 { get; } = EncryptionService.GetRandomString(rnd.Next(25, 125));
-
+        #endregion
 
         public async Task<bool> Decrypt(string key)
         {
@@ -134,21 +122,11 @@ namespace Fortress.Models
                 new VaultFileEntry { Username = "Myuser321e", Password = "passwor11d123", Notes = "Lorem ipsum diolti watl", CreatedAt = DateTime.Now, ModifiedAt = DateTime.Now.AddDays(7), Title = "Wut" }
             };
         }
+        
+        public ObservableCollection<VaultFileEntry> Entries { get; set; }
 
-        private ObservableCollection<VaultFileEntry> _entries;
-        public ObservableCollection<VaultFileEntry> Entries
-        {
-            get { return _entries; }
-            set { Set(ref _entries, value); }
-        }
+        public Task EncryptAndSave() => Task.CompletedTask;
 
-        public Task EncryptAndSave()
-        {
-            return Task.CompletedTask;
-        }
-
-        public void AddNewEntry(VaultFileEntry entry)
-        {
-        }
+        public void AddNewEntry(VaultFileEntry entry) { }
     }
 }

@@ -10,7 +10,6 @@ namespace Fortress.Models
     public interface IVaultFile
     {
         ObservableCollection<VaultFileEntry> Entries { get; set; }
-
         Task EncryptAndSave();
         void AddNewEntry(VaultFileEntry entry);
     }

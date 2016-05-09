@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Fortress.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,20 +10,14 @@ namespace Fortress.Models
 {
     public class VaultFileEntry
     {
-        public VaultFileEntry()
-        {
-            ID = Guid.NewGuid();
-        }
-           
-        public VaultFileEntry Copy() => (VaultFileEntry)MemberwiseClone();
-
-        public readonly Guid ID;
+        public readonly Guid ID = Guid.NewGuid();
         public string Title { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
         public string Notes { get; set; }
         public DateTime? CreatedAt { get; set; }
-
         public DateTime? ModifiedAt { get; set; }
+
+        public VaultFileEntry Copy() => (VaultFileEntry)MemberwiseClone();
     }
 }
