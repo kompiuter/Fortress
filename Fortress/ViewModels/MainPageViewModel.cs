@@ -11,15 +11,19 @@ using Fortress.Dialogs;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Controls;
 using Fortress.Views;
+using Fortress.Services;
 
 namespace Fortress.ViewModels
 {
     public class MainPageViewModel : ViewModelBase
     {
+        private ToastService _ToastService;
         public MainPageViewModel()
         {
             if (Windows.ApplicationModel.DesignMode.DesignModeEnabled)
                 Vault = new MockVaultFile();
+            else
+                _ToastService = new ToastService();
         }
 
         #region Properties
@@ -68,7 +72,11 @@ namespace Fortress.ViewModels
 
         DelegateCommand _saveVaultCommand;
         public DelegateCommand SaveVaultCommand
-            => _saveVaultCommand ?? (_saveVaultCommand = new DelegateCommand(async () => await Vault.EncryptAndSave()));
+            => _saveVaultCommand ?? (_saveVaultCommand = new DelegateCommand(async () => 
+            {
+                await Vault.EncryptAndSave();
+                _ToastService.ShowToast(Vault.File.Path, Vault.FileTitle, "Vault successfully saved.");
+            }));
 
         DelegateCommand _goBackCommand;
         public DelegateCommand GoBackCommand

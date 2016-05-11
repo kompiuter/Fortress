@@ -16,7 +16,7 @@ namespace Fortress.Models
     {
         public VaultFile(StorageFile file, string key)
         {
-            _file = file;
+            File = file;
             _key = key;
             VaultID = Guid.NewGuid();
         }
@@ -26,7 +26,8 @@ namespace Fortress.Models
         [JsonRequired]
         public Guid VaultID { get; private set; }
         
-        private StorageFile _file { get; }
+        [JsonIgnore]
+        public StorageFile File { get; }
 
         private string _key { get; set; }
 
@@ -38,8 +39,8 @@ namespace Fortress.Models
             {
                 if (string.IsNullOrWhiteSpace(_fileTitle))
                 {
-                    var index = _file.Path.LastIndexOf('\\');
-                    _fileTitle = _file.Path.Substring(index + 1);
+                    var index = File.Path.LastIndexOf('\\');
+                    _fileTitle = File.Path.Substring(index + 1);
                 }
 
                 return _fileTitle;
@@ -58,7 +59,7 @@ namespace Fortress.Models
         public async Task<bool> Decrypt(string key)
         {
             string encrTxt = string.Empty;
-            using (var fileStream = await _file.OpenStreamForReadAsync())
+            using (var fileStream = await File.OpenStreamForReadAsync())
                 using (var reader = new StreamReader(fileStream))
                     encrTxt = await reader.ReadToEndAsync();
             
@@ -87,7 +88,7 @@ namespace Fortress.Models
             // Encrypt serialized object
             string encrStr = EncryptionService.Encrypt(serVault, _key);
 
-            using (var fileStream = await _file.OpenStreamForWriteAsync())
+            using (var fileStream = await File.OpenStreamForWriteAsync())
             {
                 // Deletes any content already present in file
                 fileStream.SetLength(0);
@@ -124,6 +125,11 @@ namespace Fortress.Models
         }
         
         public ObservableCollection<VaultFileEntry> Entries { get; set; }
+
+        public string FileTitle { get; }
+
+        public StorageFile File { get; }
+        
 
         public Task EncryptAndSave() => Task.CompletedTask;
 

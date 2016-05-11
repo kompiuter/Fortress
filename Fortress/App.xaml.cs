@@ -22,10 +22,7 @@ namespace Fortress
             InitializeComponent();
 
             #region App settings
-            
-            var _settings = SettingsService.Instance;
-            RequestedTheme = _settings.AppTheme;
-            CacheMaxDuration = _settings.CacheMaxDuration;
+
             ShowShellBackButton = false;
 
             #endregion
@@ -36,12 +33,20 @@ namespace Fortress
             await Task.CompletedTask;
         }
 
-        public override async Task OnStartAsync(StartKind startKind, IActivatedEventArgs args)
+        public override Task OnStartAsync(StartKind startKind, IActivatedEventArgs args)
         {
-            NavigationService.Navigate(typeof(Views.LoginPage));
-
-            await Task.CompletedTask;
+            string arguments = string.Empty;
+            if (DetermineStartCause(args) == AdditionalKinds.JumpListItem)
+            {
+                arguments = (args as LaunchActivatedEventArgs).Arguments;
+                FileReceived?.Invoke(this, arguments);
+            }
+            NavigationService.Navigate(typeof(Views.LoginPage), arguments);
+            return Task.CompletedTask;
         }
+
+
+        public static event EventHandler<string> FileReceived;
     }
 }
 

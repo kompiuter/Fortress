@@ -13,12 +13,25 @@ using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.UI.Popups;
 using Template10.Services.NavigationService;
+using Windows.UI.Xaml.Navigation;
 
 namespace Fortress.ViewModels
 {
     public class LoginPageViewModel : ViewModelBase
     {
         private StorageFile _inputFile;
+        Services.DataService _DataService;
+        Services.SettingsServices.SettingsService _SettingService;
+
+        public LoginPageViewModel()
+        {
+            if (!Windows.ApplicationModel.DesignMode.DesignModeEnabled)
+            {
+                _DataService = new Services.DataService();
+                _SettingService = new Services.SettingsServices.SettingsService();
+            }
+        }
+
 
         #region Properties
 
@@ -59,6 +72,7 @@ namespace Fortress.ViewModels
             var vaultFile = new VaultFile(_inputFile, key);
             if (await vaultFile.Decrypt(key))
             {
+
                 GoToMainPage(vaultFile);
             }
             else
@@ -100,8 +114,11 @@ namespace Fortress.ViewModels
 
                 if (result == Windows.UI.Xaml.Controls.ContentDialogResult.Primary)
                 {
-                    var vaultFile = new VaultFile(newFile, passDialog.Password);
+                    _inputFile = newFile;
+                    var vaultFile = new VaultFile(_inputFile, passDialog.Password);
                     await vaultFile.EncryptAndSave();
+
+                    await _DataService.RegisterFile(_inputFile);
 
                     GoToMainPage(vaultFile);
                 }
@@ -127,7 +144,8 @@ namespace Fortress.ViewModels
             if (pickedFile != null)
             {
                 _inputFile = pickedFile;
-                FileInputPath = pickedFile.Path;             
+                await _DataService.RegisterFile(_inputFile);
+                FileInputPath = _inputFile.Path;             
             }
         }
 
@@ -143,6 +161,33 @@ namespace Fortress.ViewModels
         }
 
         #endregion
-        
+
+        public async override Task OnNavigatedToAsync(object parameter, NavigationMode mode, IDictionary<string, object> state)
+        {
+            if (string.IsNullOrWhiteSpace(parameter as string))
+                _inputFile = await _DataService.GetFileInfoAsync(_SettingService.Recent);
+            else
+                _inputFile = await _DataService.GetFileInfoAsync(parameter.ToString());
+
+            if (_inputFile != null)
+                FileInputPath = _inputFile.Path;
+
+            App.FileReceived += FileReceivedHandler;
+        }
+
+        public override Task OnNavigatedFromAsync(IDictionary<string, object> pageState, bool suspending)
+        {
+            _SettingService.Recent = _inputFile?.Path;
+            App.FileReceived -= FileReceivedHandler;
+            return Task.CompletedTask;
+        }
+
+        private async void FileReceivedHandler(object sender, string path)
+        {
+            _inputFile = await _DataService.GetFileInfoAsync(path);
+            FileInputPath = _inputFile?.Path;
+            NavigationService.ClearHistory();
+        }
+
     }
 }

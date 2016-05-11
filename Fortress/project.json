@@ -4,6 +4,7 @@
     "Microsoft.Xaml.Behaviors.Uwp.Managed": "1.0.3",
     "MyToolkit.Extended": "2.5.12",
     "Newtonsoft.Json": "8.0.3",
+    "NotificationsExtensions.Win10": "14295.0.1",
     "Template10": "1.1.8"
   },
   "frameworks": {
