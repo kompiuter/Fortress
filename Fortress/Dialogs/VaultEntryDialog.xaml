@@ -1,6 +1,7 @@
 ﻿<ContentDialog x:Class="Fortress.Dialogs.VaultEntryDialog"
                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+               xmlns:Converter="using:Template10.Converters"
                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                xmlns:local="using:Fortress.Dialogs"
                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -24,6 +25,17 @@
         </Grid.RowDefinitions>
 
         <Grid.Resources>
+            <Converter:ValueWhenConverter x:Key="ReverseBooleanToVisibilityConverter">
+                <Converter:ValueWhenConverter.When>
+                    <x:Boolean>False</x:Boolean>
+                </Converter:ValueWhenConverter.When>
+                <Converter:ValueWhenConverter.Value>
+                    <Visibility>Visible</Visibility>
+                </Converter:ValueWhenConverter.Value>
+                <Converter:ValueWhenConverter.Otherwise>
+                    <Visibility>Collapsed</Visibility>
+                </Converter:ValueWhenConverter.Otherwise>
+            </Converter:ValueWhenConverter>
             <Style TargetType="TextBox">
                 <Setter Property="Margin" Value="0,4,0,0" />
             </Style>
@@ -59,12 +71,16 @@
                  Header="Created At"
                  IsReadOnly="True"
                  Text="{Binding CreatedAt}"
-                 TextWrapping="Wrap" />
+                 TextWrapping="Wrap"
+                 Visibility="{Binding IsNewEntry,
+                                      Converter={StaticResource ReverseBooleanToVisibilityConverter}}" />
         <TextBox Grid.Row="6"
                  Header="Last Modified"
                  IsReadOnly="True"
                  Text="{Binding ModifiedAt}"
-                 TextWrapping="Wrap" />
+                 TextWrapping="Wrap"
+                 Visibility="{Binding IsNewEntry,
+                                      Converter={StaticResource ReverseBooleanToVisibilityConverter}}" />
 
     </Grid>
 </ContentDialog>

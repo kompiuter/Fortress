@@ -105,13 +105,17 @@ namespace Fortress.ViewModels
         private async Task ExecuteNewEntryCommand()
         {
             var entryDialog = new VaultEntryDialog();
-            var newEntry = new VaultFileEntry();
+            var newEntry = new VaultFileEntry()
+            {
+                IsNewEntry = true
+            };
             entryDialog.DataContext = newEntry;
 
             var result = await entryDialog.ShowAsync();
 
             if (result == Windows.UI.Xaml.Controls.ContentDialogResult.Primary)
             {
+                newEntry.IsNewEntry = false;
                 newEntry.CreatedAt = DateTime.Now;
                 newEntry.ModifiedAt = DateTime.Now;
                 Vault.AddNewEntry(newEntry);
@@ -141,6 +145,9 @@ namespace Fortress.ViewModels
 
         private Task ExecuteGoBackCommand()
         {
+            if (SessionState.ContainsKey("Vault"))
+                SessionState.Remove("Vault");
+
             Vault = null;
             SelectedEntry = null;
 

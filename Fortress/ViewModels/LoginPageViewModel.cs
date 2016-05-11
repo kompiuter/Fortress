@@ -95,13 +95,13 @@ namespace Fortress.ViewModels
                 {
                     FilePath = newFile.Path
                 };
-                
+
                 var result = await passDialog.ShowAsync();
 
                 if (result == Windows.UI.Xaml.Controls.ContentDialogResult.Primary)
                 {
                     var vaultFile = new VaultFile(newFile, passDialog.Password);
-                    vaultFile.EncryptAndSave();
+                    await vaultFile.EncryptAndSave();
 
                     GoToMainPage(vaultFile);
                 }

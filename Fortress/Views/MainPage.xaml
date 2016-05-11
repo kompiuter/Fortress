@@ -71,12 +71,12 @@
                 <Toolkit:DataGridTextColumn Width="180"
                                             Binding="{Binding Username}"
                                             Header="User" />
-                <!--<Toolkit:DataGridTextColumn Width="192"
-                                            Binding="{Binding CreatedAt}"
-                                            Header="Created At" />-->
                 <Toolkit:DataGridTextColumn Width="192"
                                             Binding="{Binding ModifiedAt}"
                                             Header="Last Modified" />
+                <Toolkit:DataGridTextColumn Width="192"
+                                            Binding="{Binding CreatedAt}"
+                                            Header="Created At" />
             </Toolkit:DataGrid.Columns>
         </Toolkit:DataGrid>
 
