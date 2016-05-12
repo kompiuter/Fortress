@@ -47,13 +47,23 @@
                              RelativePanel.AlignTopWithPanel="True">
             <controls:PageHeader.Content>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Vault" VerticalAlignment="Center" FontSize="21"/>
-                    <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" FontSize="16" Opacity="0.6" Text="{Binding Vault.FileTitle}"/>
+                    <TextBlock VerticalAlignment="Center"
+                               FontSize="21"
+                               Text="Vault" />
+                    <TextBlock Margin="12,0,0,0"
+                               VerticalAlignment="Center"
+                               FontSize="16"
+                               Opacity="0.6"
+                               Text="{Binding Vault.FileTitle}" />
                 </StackPanel>
             </controls:PageHeader.Content>
             <controls:PageHeader.PrimaryCommands>
-                <AppBarButton Icon="Back" Label="Go back" Command="{Binding GoBackCommand}"/>
-                <AppBarButton Icon="Save" Label="Save vault" Command="{Binding SaveVaultCommand}"/>
+                <AppBarButton Command="{Binding GoBackCommand}"
+                              Icon="Back"
+                              Label="Go back" />
+                <AppBarButton Command="{Binding SaveVaultCommand}"
+                              Icon="Save"
+                              Label="Save vault" />
             </controls:PageHeader.PrimaryCommands>
         </controls:PageHeader>
 
@@ -85,14 +95,14 @@
     <Page.BottomAppBar>
         <CommandBar>
             <AppBarButton Command="{Binding NewEntryCommand}"
-                          Label="New entry"
-                          Icon="Add" />
+                          Icon="Add"
+                          Label="New entry" />
             <AppBarButton Command="{Binding EditEntryCommand}"
-                          Label="Edit entry"
-                          Icon="Edit" />
+                          Icon="Edit"
+                          Label="Edit entry" />
             <AppBarButton Command="{Binding DeleteEntryCommand}"
-                          Label="Delete entry"
-                          Icon="Delete" />
+                          Icon="Delete"
+                          Label="Delete entry" />
         </CommandBar>
     </Page.BottomAppBar>
 

@@ -14,37 +14,45 @@ using Windows.Storage.Pickers;
 using Windows.UI.Popups;
 using Template10.Services.NavigationService;
 using Windows.UI.Xaml.Navigation;
+using Fortress.Services.SettingsServices;
 
 namespace Fortress.ViewModels
 {
     public class LoginPageViewModel : ViewModelBase
     {
-        private StorageFile _inputFile;
-        Services.DataService _DataService;
-        Services.SettingsServices.SettingsService _SettingService;
+        DataService _DataService;
+        SettingsService _SettingService;
 
         public LoginPageViewModel()
         {
             if (!Windows.ApplicationModel.DesignMode.DesignModeEnabled)
             {
-                _DataService = new Services.DataService();
-                _SettingService = new Services.SettingsServices.SettingsService();
+                _DataService = new DataService();
+                _SettingService = new SettingsService();
             }
         }
 
 
         #region Properties
 
-        private string _fileInputPath;
-        public string FileInputPath
+        private StorageFile _inputFile;
+        public StorageFile InputFile
         {
-            get { return _fileInputPath; }
-            set
+            get
             {
-                if (Set(ref _fileInputPath, value))
+                return _inputFile;
+            }
+            private set
+            {
+                if (Set(ref _inputFile, value))
+                {
                     UnlockFileCommand.RaiseCanExecuteChanged();
+                    RaisePropertyChanged(nameof(InputFilePath));
+                }
             }
         }
+
+        public string InputFilePath => InputFile?.Path;
 
         #endregion
 
@@ -61,7 +69,7 @@ namespace Fortress.ViewModels
         DelegateCommand<string> _unlockFileCommand;
         public DelegateCommand<string> UnlockFileCommand
             => _unlockFileCommand ?? (_unlockFileCommand = new DelegateCommand<string>(async (p) => await ExecuteUnlockFileCommand(p),
-                                                                                             (p) => !string.IsNullOrEmpty(p) && !string.IsNullOrWhiteSpace(_fileInputPath)));
+                                                                                             (p) => !string.IsNullOrEmpty(p) && !string.IsNullOrWhiteSpace(InputFilePath)));
 
         #endregion
 
@@ -69,15 +77,14 @@ namespace Fortress.ViewModels
 
         private async Task ExecuteUnlockFileCommand(string key)
         {
-            var vaultFile = new VaultFile(_inputFile, key);
+            var vaultFile = new VaultFile(InputFile, key);
             if (await vaultFile.Decrypt(key))
             {
-
-                GoToMainPage(vaultFile);
+                await GoToMainPage(vaultFile);
             }
             else
             {
-                string dialogContent = _fileInputPath
+                string dialogContent = InputFilePath
                                      + Environment.NewLine
                                      + Environment.NewLine
                                      + "Failed to unlock the specified file!"
@@ -114,13 +121,11 @@ namespace Fortress.ViewModels
 
                 if (result == Windows.UI.Xaml.Controls.ContentDialogResult.Primary)
                 {
-                    _inputFile = newFile;
-                    var vaultFile = new VaultFile(_inputFile, passDialog.Password);
+                    InputFile = newFile;
+                    var vaultFile = new VaultFile(InputFile, passDialog.Password);
                     await vaultFile.EncryptAndSave();
 
-                    await _DataService.RegisterFile(_inputFile);
-
-                    GoToMainPage(vaultFile);
+                    await GoToMainPage(vaultFile);
                 }
                 else
                 {
@@ -142,52 +147,52 @@ namespace Fortress.ViewModels
             var pickedFile = await picker.PickSingleFileAsync();
 
             if (pickedFile != null)
-            {
-                _inputFile = pickedFile;
-                await _DataService.RegisterFile(_inputFile);
-                FileInputPath = _inputFile.Path;             
-            }
+                InputFile = pickedFile;      
         }
 
-        private void GoToMainPage(VaultFile vaultFile)
+        private async Task GoToMainPage(VaultFile vaultFile)
         {
             if (SessionState.ContainsKey("Vault"))
                 SessionState.Remove("Vault");
-
             SessionState.Add("Vault", vaultFile);
+
+            await _DataService.RegisterFile(InputFile);
 
             NavigationService.Navigate(typeof(MainPage));
             NavigationService.ClearHistory();
         }
 
+        private async void FileReceivedHandler(object sender, string path)
+        {
+            InputFile = await _DataService.GetFileInfoAsync(path);
+
+            NavigationService.ClearHistory();
+        }
+
         #endregion
+
+        #region Overrides
 
         public async override Task OnNavigatedToAsync(object parameter, NavigationMode mode, IDictionary<string, object> state)
         {
+            // Jump-file passed as parameter on activation
             if (string.IsNullOrWhiteSpace(parameter as string))
-                _inputFile = await _DataService.GetFileInfoAsync(_SettingService.Recent);
+                InputFile = await _DataService.GetFileInfoAsync(_SettingService.Recent);
             else
-                _inputFile = await _DataService.GetFileInfoAsync(parameter.ToString());
-
-            if (_inputFile != null)
-                FileInputPath = _inputFile.Path;
+                InputFile = await _DataService.GetFileInfoAsync(parameter.ToString());
 
             App.FileReceived += FileReceivedHandler;
         }
 
         public override Task OnNavigatedFromAsync(IDictionary<string, object> pageState, bool suspending)
         {
-            _SettingService.Recent = _inputFile?.Path;
+            _SettingService.Recent = InputFilePath;
             App.FileReceived -= FileReceivedHandler;
+
             return Task.CompletedTask;
         }
 
-        private async void FileReceivedHandler(object sender, string path)
-        {
-            _inputFile = await _DataService.GetFileInfoAsync(path);
-            FileInputPath = _inputFile?.Path;
-            NavigationService.ClearHistory();
-        }
+        #endregion
 
     }
 }

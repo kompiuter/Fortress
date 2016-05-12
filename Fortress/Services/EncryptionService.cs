@@ -21,7 +21,7 @@ namespace Fortress.Services
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
-        private static IBuffer GetMD5Hash(string key)
+        public static IBuffer GetMD5Hash(string key)
         {
             // Convert the message string to binary data.
             IBuffer buffUtf8Msg = CryptographicBuffer.ConvertStringToBinary(key, BinaryStringEncoding.Utf8);
@@ -45,15 +45,12 @@ namespace Fortress.Services
         /// Encrypt a string using dual encryption method. Returns an encrypted text.
         /// </summary>
         /// <param name="toEncrypt">String to be encrypted</param>
-        /// <param name="key">Unique key for encryption/decryption</param>m>
+        /// <param name="keyHash">Unique key hash for encryption/decryption</param>m>
         /// <returns>Returns encrypted string.</returns>
-        public static string Encrypt(string toEncrypt, string key)
+        public static string Encrypt(string toEncrypt, IBuffer keyHash)
         {
             try
             {
-                // Get the MD5 key hash (you can as well use the binary of the key string)
-                var keyHash = GetMD5Hash(key);
-
                 // Create a buffer that contains the encoded message to be encrypted.
                 var toDecryptBuffer = CryptographicBuffer.ConvertStringToBinary(toEncrypt, BinaryStringEncoding.Utf8);
 
@@ -76,25 +73,36 @@ namespace Fortress.Services
 
                 return strEncrypted;
             }
-            catch (Exception ex)
+            catch
             {
                 return "";
             }
         }
 
         /// <summary>
+        /// Encrypt a string using dual encryption method. Returns an encrypted text.
+        /// </summary>
+        /// <param name="toEncrypt">String to be encrypted</param>
+        /// <param name="key">Unique key for encryption/decryption</param>m>
+        /// <returns>Returns encrypted string.</returns>
+        public static string Encrypt(string toEncrypt, string key)
+        {       
+            // Get the MD5 key hash (you can as well use the binary of the key string)
+            var keyHash = GetMD5Hash(key);
+
+            return Encrypt(toEncrypt, keyHash);              
+        }
+
+        /// <summary>
         /// Decrypt a string using dual encryption method. Return a Decrypted clear string
         /// </summary>
         /// <param name="cipherString">Encrypted string</param>
-        /// <param name="key">Unique key for encryption/decryption</param>
+        /// <param name="keyHash">Unique key hash for encryption/decryption</param>
         /// <returns>Returns decrypted text.</returns>
-        public static string Decrypt(string cipherString, string key)
+        public static string Decrypt(string cipherString, IBuffer keyHash)
         {
             try
             {
-                // Get the MD5 key hash (you can as well use the binary of the key string)
-                var keyHash = GetMD5Hash(key);
-
                 // Create a buffer that contains the encoded message to be decrypted.
                 IBuffer toDecryptBuffer = CryptographicBuffer.DecodeFromBase64String(cipherString);
 
@@ -114,6 +122,20 @@ namespace Fortress.Services
             {
                 return "";
             }
-        }        
+        }
+
+        /// <summary>
+        /// Decrypt a string using dual encryption method. Return a Decrypted clear string
+        /// </summary>
+        /// <param name="cipherString">Encrypted string</param>
+        /// <param name="key">Unique key for encryption/decryption</param>
+        /// <returns>Returns decrypted text.</returns>
+        public static string Decrypt(string cipherString, string key)
+        {
+            // Get the MD5 key hash (you can as well use the binary of the key string)
+            var keyHash = GetMD5Hash(key);
+
+            return Decrypt(cipherString, keyHash);
+        }
     }
 }

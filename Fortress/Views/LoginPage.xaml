@@ -40,7 +40,7 @@
                  IsReadOnly="True"
                  RelativePanel.AlignLeftWith="rectangle"
                  RelativePanel.AlignTopWith="rectangle"
-                 Text="{x:Bind Vm.FileInputPath, Mode=OneWay}" />
+                 Text="{x:Bind Vm.InputFilePath, Mode=OneWay}" />
         <Button Width="40"
                 Command="{x:Bind Vm.OpenFileCommand}"
                 RelativePanel.AlignBottomWith="fileTextBox"

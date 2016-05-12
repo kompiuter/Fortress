@@ -9,15 +9,19 @@ using System.Text;
 using System.Threading.Tasks;
 using Template10.Mvvm;
 using Windows.Storage;
+using Windows.Storage.Streams;
 
 namespace Fortress.Models
 {
     public class VaultFile : BindableBase, IVaultFile
     {
+        [JsonConstructor]
+        public VaultFile() { }
+
         public VaultFile(StorageFile file, string key)
         {
             File = file;
-            _key = key;
+            HashedKey = EncryptionService.GetMD5Hash(key);
             VaultID = Guid.NewGuid();
         }
 
@@ -29,7 +33,7 @@ namespace Fortress.Models
         [JsonIgnore]
         public StorageFile File { get; }
 
-        private string _key { get; set; }
+        private IBuffer HashedKey { get; set; }
 
         private string _fileTitle = string.Empty;
         [JsonIgnore]
@@ -62,15 +66,16 @@ namespace Fortress.Models
             using (var fileStream = await File.OpenStreamForReadAsync())
                 using (var reader = new StreamReader(fileStream))
                     encrTxt = await reader.ReadToEndAsync();
-            
-            var decrText = EncryptionService.Decrypt(encrTxt, key);
+
+            var keyHash = EncryptionService.GetMD5Hash(key);
+            var decrText = EncryptionService.Decrypt(encrTxt, keyHash);
 
             if (string.IsNullOrEmpty(decrText))
                 return false;
-            else
+            else 
             {
-                // Success in decryption, save key & deserialize ...
-                _key = key;
+                // Success in decryption
+                HashedKey = keyHash;
 
                 var vaultFile = JsonConvert.DeserializeObject<VaultFile>(decrText);
                 VaultID = vaultFile.VaultID;
@@ -86,7 +91,7 @@ namespace Fortress.Models
             var serVault = JsonConvert.SerializeObject(this);
 
             // Encrypt serialized object
-            string encrStr = EncryptionService.Encrypt(serVault, _key);
+            string encrStr = EncryptionService.Encrypt(serVault, HashedKey);
 
             using (var fileStream = await File.OpenStreamForWriteAsync())
             {
@@ -107,6 +112,9 @@ namespace Fortress.Models
         }
     }
 
+    /// <summary>
+    /// Used for design time data
+    /// </summary>
     public class MockVaultFile : BindableBase, IVaultFile
     {
         public MockVaultFile()
