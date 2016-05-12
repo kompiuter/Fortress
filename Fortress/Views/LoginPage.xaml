@@ -1,11 +1,11 @@
 ﻿<Page x:Class="Fortress.Views.LoginPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:Behaviors="using:Template10.Behaviors"
+      xmlns:Core="using:Microsoft.Xaml.Interactions.Core"
+      xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="using:Fortress.Views"
-               xmlns:Behaviors="using:Template10.Behaviors"
-               xmlns:Core="using:Microsoft.Xaml.Interactions.Core"
-               xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:vm="using:Fortress.ViewModels"
       mc:Ignorable="d">
@@ -19,11 +19,11 @@
             <ImageBrush ImageSource="/Resources/metallic_mesh.jpg" Stretch="UniformToFill" />
         </RelativePanel.Background>
 
-        <Image Source="/Resources/fortresslogo2.png"
+        <Image Width="96"
                Margin="0,0,0,32"
-               Width="96"
                RelativePanel.Above="rectangle"
-               RelativePanel.AlignHorizontalCenterWithPanel="True"/>
+               RelativePanel.AlignHorizontalCenterWithPanel="True"
+               Source="/Resources/fortresslogo2.png" />
 
         <Rectangle x:Name="rectangle"
                    Width="300"
@@ -45,7 +45,7 @@
                 Command="{x:Bind Vm.OpenFileCommand}"
                 RelativePanel.AlignBottomWith="fileTextBox"
                 RelativePanel.RightOf="fileTextBox">
-            <SymbolIcon Symbol="OpenFile"/>
+            <SymbolIcon Symbol="OpenFile" />
         </Button>
 
         <PasswordBox x:Name="passwordTextBox"
@@ -53,7 +53,18 @@
                      Margin="16,8,0,0"
                      Header="Key"
                      RelativePanel.AlignLeftWith="rectangle"
-                     RelativePanel.Below="fileTextBox"/>
+                     RelativePanel.Below="fileTextBox">
+            <Interactivity:Interaction.Behaviors>
+                <Core:DataTriggerBehavior Binding="{x:Bind Vm.InputFilePath}"
+                                          ComparisonCondition="NotEqual"
+                                          Value="{x:Null}">
+                    <Behaviors:FocusAction />
+                </Core:DataTriggerBehavior>
+                <Behaviors:KeyBehavior Key="Enter">
+                    <Core:InvokeCommandAction Command="{x:Bind Vm.UnlockFileCommand}" CommandParameter="{Binding ElementName=passwordTextBox, Path=Password}" />
+                </Behaviors:KeyBehavior>
+            </Interactivity:Interaction.Behaviors>
+        </PasswordBox>
 
         <StackPanel Margin="0,0,0,16"
                     Orientation="Horizontal"
@@ -66,8 +77,8 @@
                 <Button.Content>
                     <StackPanel Orientation="Horizontal">
                         <SymbolIcon Margin="0,0,4,0"
-                                    Symbol="ProtectedDocument"
-                                    Foreground="Black" />
+                                    Foreground="Black"
+                                    Symbol="ProtectedDocument" />
                         <TextBlock Text="Unlock" />
                     </StackPanel>
                 </Button.Content>
@@ -76,8 +87,8 @@
                 <Button.Content>
                     <StackPanel Orientation="Horizontal">
                         <SymbolIcon Margin="0,0,4,0"
-                                  Foreground="Black"
-                                  Symbol="NewFolder" />
+                                    Foreground="Black"
+                                    Symbol="NewFolder" />
                         <TextBlock Text="New File" />
                     </StackPanel>
                 </Button.Content>

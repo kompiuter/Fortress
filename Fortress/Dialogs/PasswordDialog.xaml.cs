@@ -54,6 +54,7 @@ namespace Fortress.Dialogs
             {
                 IsPrimaryButtonEnabled = false;
                 ValidationVisibility = Visibility.Visible;
+                PasswordErrorVisibility = Visibility.Collapsed;
             }
 
             //if (string.IsNullOrEmpty(passwordBox.Password) || string.IsNullOrEmpty(repeatPasswordBox.Password))
@@ -61,6 +62,11 @@ namespace Fortress.Dialogs
 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ValidationVisibility)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PasswordErrorVisibility)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsLongEnough)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DoesContainDigit)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DoesContainUpper)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DoesContainLower)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DoesContainSymbol)));
         }
 
         private bool ValidatePassword(string password)
@@ -75,18 +81,18 @@ namespace Fortress.Dialogs
             //   ii. Lower case characters
             //   iii. Symbols
             //   iiii. Digits
-            if (password.Length < 8)
+            if (!IsLongEnough)
                 return false;
 
             int conditionsMet = 0;
 
-            if (password.Any(c => Char.IsUpper(c)))
+            if (DoesContainDigit)
                 ++conditionsMet;
-            if (password.Any(c => Char.IsLower(c)))
+            if (DoesContainUpper)
                 ++conditionsMet;
-            if (password.Any(c => Char.IsDigit(c)))
+            if (DoesContainLower)
                 ++conditionsMet;
-            if (password.Any(c => Char.IsSymbol(c) || char.IsPunctuation(c)))
+            if (DoesContainSymbol)
                 ++conditionsMet;
 
             if (conditionsMet >= 3)
@@ -128,11 +134,11 @@ namespace Fortress.Dialogs
 
         #endregion
 
-        public void TestPrimary()
-        {
-
-        }
-
+        public bool IsLongEnough => passwordBox.Password?.Length >= 8;
+        public bool DoesContainDigit => passwordBox.Password?.Any(p => char.IsDigit(p)) ?? false;
+        public bool DoesContainUpper => passwordBox.Password?.Any(p => char.IsUpper(p)) ?? false;
+        public bool DoesContainLower => passwordBox.Password?.Any(p => char.IsLower(p)) ?? false;
+        public bool DoesContainSymbol => passwordBox.Password?.Any(p => char.IsSymbol(p) || char.IsPunctuation(p)) ?? false;
 
     }
 }

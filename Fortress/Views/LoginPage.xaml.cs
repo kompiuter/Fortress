@@ -31,6 +31,6 @@ namespace Fortress.Views
         }
 
         public LoginPageViewModel Vm => (LoginPageViewModel)DataContext;
-        
+
     }
 }
