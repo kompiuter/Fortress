@@ -32,10 +32,17 @@ namespace Fortress
         {
             await Task.CompletedTask;
         }
+        
 
         public override Task OnStartAsync(StartKind startKind, IActivatedEventArgs args)
         {
             string arguments = string.Empty;
+            if (DetermineStartCause(args) == AdditionalKinds.Other)
+            {
+                arguments = (args as FileActivatedEventArgs).Files.First().Path;
+                FileReceived?.Invoke(this, arguments);
+            }
+
             if (DetermineStartCause(args) == AdditionalKinds.JumpListItem)
             {
                 arguments = (args as LaunchActivatedEventArgs).Arguments;
@@ -44,6 +51,7 @@ namespace Fortress
             NavigationService.Navigate(typeof(Views.LoginPage), arguments);
             return Task.CompletedTask;
         }
+        
 
 
         public static event EventHandler<string> FileReceived;
